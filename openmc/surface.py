@@ -2654,6 +2654,8 @@ class TPMS(Surface):
         relative_densities = [1-x for x in porosities]
         return TPMS.from_relative_densities(surface_type, relative_densities, pitch, _resolution, *args, **kwargs)
 
+    def get_thickness(self):
+        return self.pitch*self.isovalue/(2*pi)
 
 class FunctionTPMS(Surface):
     """Class representing a Function-based Triply Periodic Minimal Surface (FunctionTPMS).
