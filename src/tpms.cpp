@@ -504,12 +504,10 @@ double Diamond::fppk(double k, Position r, Direction u) const
   const double yyp = d * u.x + e * u.y + f * u.z;
   const double zzp = g * u.x + h * u.y + i * u.z;
   return -0.5 * l * l *
-         (-(xxp - yyp) * (xxp - yyp) * sin(l * (xx - yy)) +
-           (xxp + yyp) * (xxp + yyp) * sin(l * (xx + yy)) +
-           (xxp - zzp) * (xxp - zzp) * sin(l * (xx - zz)) +
-           (xxp + zzp) * (xxp + zzp) * sin(l * (xx + zz)) -
-           (yyp - zzp) * (yyp - zzp) * sin(l * (yy - zz)) +
-           (yyp + zzp) * (yyp + zzp) * sin(l * (yy + zz)));
+         ((-xxp + yyp + zzp) * (-xxp + yyp + zzp) * sin(l * (-xx + yy + zz)) +
+           (xxp - yyp + zzp) * (xxp - yyp + zzp) * sin(l * (xx - yy + zz)) +
+           (xxp + yyp - zzp) * (xxp + yyp - zzp) * sin(l * (xx + yy - zz)) +
+           (xxp + yyp + zzp) * (xxp + yyp + zzp) * sin(l * (xx + yy + zz)));
 }
 
 double Diamond::sampling_frequency(Direction u) const
@@ -603,7 +601,6 @@ double FunctionSchwarzP::fpk(double k, Position r, Direction u) const
     double dk = 1.e-9;
     double f1 = this->fk(k + dk, r, u);
     double f0 = this->fk(k - dk, r, u);
-    double brut_value = (f1 - f0) / (2 * dk);
     return (f1 - f0) / (2 * dk);
   } else {
     // to code explicit derivatives the day functions not using approximate
@@ -667,8 +664,21 @@ double FunctionGyroid::evaluate(Position r) const
 
 Direction FunctionGyroid::normal(Position r) const
 {
-  // TODO: a coder quand j'aurais un peu moins la flemme.
-  return Direction();
+  const double dr = 1.e-7;
+  const double dx =
+    (this->evaluate(Position(r.x + dr, r.y, r.z)) -
+      this->evaluate(Position(r.x - dr, r.y, r.z))) /
+    (2.0 * dr);
+  const double dy =
+    (this->evaluate(Position(r.x, r.y + dr, r.z)) -
+      this->evaluate(Position(r.x, r.y - dr, r.z))) /
+    (2.0 * dr);
+  const double dz =
+    (this->evaluate(Position(r.x, r.y, r.z + dr)) -
+      this->evaluate(Position(r.x, r.y, r.z - dr))) /
+    (2.0 * dr);
+  const double norm = pow(pow(dx, 2) + pow(dy, 2) + pow(dz, 2), 0.5);
+  return Direction(dx / norm, dy / norm, dz / norm);
 }
 
 double FunctionGyroid::fk(double k, Position r, Direction u) const
@@ -686,13 +696,12 @@ double FunctionGyroid::fpk(double k, Position r, Direction u) const
     double dk = 1.e-9;
     double f1 = this->fk(k + dk, r, u);
     double f0 = this->fk(k - dk, r, u);
-    double brut_value = (f1 - f0) / (2 * dk);
     return (f1 - f0) / (2 * dk);
   } else {
     // to code explicit derivatives the day functions not using approximate
     // derivatives are implemented
     fatal_error(
-      "Analitical first derivate is not implemented for FunctionSchwarzP.");
+      "Analitical first derivate is not implemented for FunctionGyroid.");
   }
 }
 
@@ -708,7 +717,7 @@ double FunctionGyroid::fppk(double k, Position r, Direction u) const
     // to code explicit derivatives the day functions not using approximate
     // derivatives are implemented
     fatal_error(
-      "Analitical second derivate is not implemented for FunctionSchwarzP.");
+      "Analitical second derivate is not implemented for FunctionGyroid.");
   }
 }
 
@@ -752,8 +761,21 @@ double FunctionDiamond::evaluate(Position r) const
 
 Direction FunctionDiamond::normal(Position r) const
 {
-  // TODO: a coder quand j'aurais un peu moins la flemme.
-  return Direction();
+  const double dr = 1.e-7;
+  const double dx =
+    (this->evaluate(Position(r.x + dr, r.y, r.z)) -
+      this->evaluate(Position(r.x - dr, r.y, r.z))) /
+    (2.0 * dr);
+  const double dy =
+    (this->evaluate(Position(r.x, r.y + dr, r.z)) -
+      this->evaluate(Position(r.x, r.y - dr, r.z))) /
+    (2.0 * dr);
+  const double dz =
+    (this->evaluate(Position(r.x, r.y, r.z + dr)) -
+      this->evaluate(Position(r.x, r.y, r.z - dr))) /
+    (2.0 * dr);
+  const double norm = pow(pow(dx, 2) + pow(dy, 2) + pow(dz, 2), 0.5);
+  return Direction(dx / norm, dy / norm, dz / norm);
 }
 
 double FunctionDiamond::fk(double k, Position r, Direction u) const
@@ -771,7 +793,6 @@ double FunctionDiamond::fpk(double k, Position r, Direction u) const
     double dk = 1.e-9;
     double f1 = this->fk(k + dk, r, u);
     double f0 = this->fk(k - dk, r, u);
-    double brut_value = (f1 - f0) / (2 * dk);
     return (f1 - f0) / (2 * dk);
   } else {
     // to code explicit derivatives the day functions not using approximate
@@ -793,7 +814,7 @@ double FunctionDiamond::fppk(double k, Position r, Direction u) const
     // to code explicit derivatives the day functions not using approximate
     // derivatives are implemented
     fatal_error(
-      "Analitical second derivate is not implemented for FunctionSchwarzP.");
+      "Analitical second derivate is not implemented for FunctionDiamond.");
   }
 }
 
