@@ -4,17 +4,36 @@
 
 ## Installation
 
-##### create a new conda env:
+### TLDR
+
 ```
-conda create -n openmc-TPMS moose-dev=2024.10.01=mpich
+conda create -n openmc-TPMS compilers=1.9.0 cmake hdf5 python libpng
 conda deactivate
 conda activate openmc-TPMS
-# conda install boost=1.85.0 # not needed anymore
+git clone --recurse-submodules https://github.com/pferney05/openmc-dev.git
+cd openmc-dev
+git checkout TPMS
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=/path/to/conda/envs/openmc-TPMS ..
+make
+make install
+cd ..
+python -m pip install .
+```
+
+### Step by step
+
+##### create a new conda env:
+```
+conda create -n openmc-TPMS compilers=1.9.0 cmake hdf5 python libpng
+conda deactivate
+conda activate openmc-TPMS
 ```
 ##### clone the project to your local repo:
 ```
-git clone git@github.inl.gov:paul-ferney/openmc.git
-cd openmc
+git clone --recurse-submodules https://github.com/pferney05/openmc-dev.git
+cd openmc-dev
 git checkout TPMS
 ```
 ##### install openmc python API in dev mode:
@@ -24,20 +43,20 @@ python -m pip install -e .[test]
 ##### check that your compilers are from your conda env:
 ```
 which $CC && which $CXX
->>> /opt/anaconda3/envs/openmc-TPMS/bin/mpicc
->>> /opt/anaconda3/envs/openmc-TPMS/bin/mpicxx
+>>> /path/to/conda/envs/openmc-TPMS/bin/mpicc
+>>> /path/to/conda/envs/openmc-TPMS/bin/mpicxx
 ```
 ##### create a build directory and make your project:
 ```
 mkdir ./build && cd ./build
-cmake .. && make -j 12
+cmake -DCMAKE_INSTALL_PREFIX=/path/to/conda/envs/openmc-TPMS .. && make -j 12
 cd ..
 ```
 ##### test openmc:
 ```
 cd tests/regression_tests/TPMS/base_no_tpms
 python base_no_tpms.py
-../../../build/bin/openmc
+openmc
 ```
 
 ## Trouble shooting
