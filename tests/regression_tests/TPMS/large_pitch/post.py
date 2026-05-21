@@ -8,7 +8,7 @@ files = ["res_0.125.out", "res_0.062.out", "res_0.031.out", "res_0.015.out"]
 
 pattern = re.compile(r"Combined k-effective\s*=\s*([0-9.]+)")
 
-fig, axs = plt.subplots(1, 3)
+fig, axs = plt.subplots(1, 3, figsize=[12.8,4.8])
 
 for surface, ax in zip(surfaces, axs):
     for fname in files:
@@ -24,7 +24,7 @@ for surface, ax in zip(surfaces, axs):
             keffs.append(float(match.group(1)))
 
         ax.plot(pitches, keffs, marker="o", label=fname)
-
+    ax.set_title(surface)
     ax.set_xlabel("pitch")
     ax.set_ylabel("keff")
     ax.legend()
