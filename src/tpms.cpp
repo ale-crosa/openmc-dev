@@ -135,12 +135,12 @@ double TPMS::ray_tracing(Position r, Direction u, double max_range)
     if (solution.isRoot) {
       // std::pair<double, double> sol =
       // boost::math::tools::bisect([this,r,u](double k){return this->fk(k, r,
-      // u);}, solution.xa, solution.xb, [](double l, double r){return abs(l-r)
+      // u);}, solution.xa, solution.xb, [](double l, double r){return std::abs(l-r)
       // < 1e-8;});
       std::pair<double, double> sol =
         bisect([this, r, u](double k) { return this->fk(k, r, u); },
           solution.xa, solution.xb,
-          [](double l, double r) { return abs(l - r) < 1e-8; }, max_iter);
+          [](double l, double r) { return std::abs(l - r) < 1e-8; }, max_iter);
       root = sol.second;
       rootFound = true;
     } else {
@@ -299,7 +299,7 @@ double SchwarzP::sampling_frequency(Direction u) const
   const double xxp = a * u.x + b * u.y + c * u.z;
   const double yyp = d * u.x + e * u.y + f * u.z;
   const double zzp = g * u.x + h * u.y + i * u.z;
-  std::vector<double> pulses = {abs(xxp), abs(yyp), abs(zzp)};
+  std::vector<double> pulses = {std::abs(xxp), std::abs(yyp), std::abs(zzp)};
   std::vector<double>::iterator pmax;
   pmax = std::max_element(pulses.begin(), pulses.end());
   return 0.125 * pitch / *pmax;
@@ -408,8 +408,8 @@ double Gyroid::sampling_frequency(Direction u) const
   const double xxp = a * u.x + b * u.y + c * u.z;
   const double yyp = d * u.x + e * u.y + f * u.z;
   const double zzp = g * u.x + h * u.y + i * u.z;
-  std::vector<double> pulses = {abs(xxp + yyp), abs(xxp - yyp), abs(xxp + zzp),
-    abs(xxp - zzp), abs(yyp + zzp), abs(yyp - zzp)};
+  std::vector<double> pulses = {std::abs(xxp + yyp), std::abs(xxp - yyp), std::abs(xxp + zzp),
+    std::abs(xxp - zzp), std::abs(yyp + zzp), std::abs(yyp - zzp)};
   std::vector<double>::iterator pmax;
   pmax = std::max_element(pulses.begin(), pulses.end());
   return 0.125 * pitch / *pmax;
@@ -515,8 +515,8 @@ double Diamond::sampling_frequency(Direction u) const
   const double xxp = a * u.x + b * u.y + c * u.z;
   const double yyp = d * u.x + e * u.y + f * u.z;
   const double zzp = g * u.x + h * u.y + i * u.z;
-  std::vector<double> pulses = {abs(+xxp + yyp + zzp), abs(+xxp + yyp - zzp),
-    abs(+xxp - yyp + zzp), abs(-xxp + yyp + zzp)};
+  std::vector<double> pulses = {std::abs(+xxp + yyp + zzp), std::abs(+xxp + yyp - zzp),
+    std::abs(+xxp - yyp + zzp), std::abs(-xxp + yyp + zzp)};
   std::vector<double>::iterator pmax;
   pmax = std::max_element(pulses.begin(), pulses.end());
   return 0.125 * pitch / *pmax;
@@ -631,7 +631,7 @@ double FunctionSchwarzP::sampling_frequency(Direction u) const
   const double xxp = a * u.x + b * u.y + c * u.z;
   const double yyp = d * u.x + e * u.y + f * u.z;
   const double zzp = g * u.x + h * u.y + i * u.z;
-  std::vector<double> pulses = {abs(xxp), abs(yyp), abs(zzp)};
+  std::vector<double> pulses = {std::abs(xxp), std::abs(yyp), std::abs(zzp)};
   std::vector<double>::iterator pmax;
   pmax = std::max_element(pulses.begin(), pulses.end());
   const double min_pitch = fPitch.minimalValue;
@@ -726,8 +726,8 @@ double FunctionGyroid::sampling_frequency(Direction u) const
   const double xxp = a * u.x + b * u.y + c * u.z;
   const double yyp = d * u.x + e * u.y + f * u.z;
   const double zzp = g * u.x + h * u.y + i * u.z;
-  std::vector<double> pulses = {abs(xxp + yyp), abs(xxp - yyp), abs(xxp + zzp),
-    abs(xxp - zzp), abs(yyp + zzp), abs(yyp - zzp)};
+  std::vector<double> pulses = {std::abs(xxp + yyp), std::abs(xxp - yyp), std::abs(xxp + zzp),
+    std::abs(xxp - zzp), std::abs(yyp + zzp), std::abs(yyp - zzp)};
   std::vector<double>::iterator pmax;
   pmax = std::max_element(pulses.begin(), pulses.end());
   const double min_pitch = fPitch.minimalValue;
@@ -823,8 +823,8 @@ double FunctionDiamond::sampling_frequency(Direction u) const
   const double xxp = a * u.x + b * u.y + c * u.z;
   const double yyp = d * u.x + e * u.y + f * u.z;
   const double zzp = g * u.x + h * u.y + i * u.z;
-  std::vector<double> pulses = {abs(+xxp + yyp + zzp), abs(+xxp + yyp - zzp),
-    abs(+xxp - yyp + zzp), abs(-xxp + yyp + zzp)};
+  std::vector<double> pulses = {std::abs(+xxp + yyp + zzp), std::abs(+xxp + yyp - zzp),
+    std::abs(+xxp - yyp + zzp), std::abs(-xxp + yyp + zzp)};
   std::vector<double>::iterator pmax;
   pmax = std::max_element(pulses.begin(), pulses.end());
   const double min_pitch = fPitch.minimalValue;
