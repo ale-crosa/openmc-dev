@@ -1,0 +1,33 @@
+<?xml version='1.0' encoding='utf-8'?>
+<materials>
+  <material depletable="true" id="0" name="mFuel_HALEU" temperature="1300.0">
+    <density units="g/cm3" value="10.5"/>
+    <nuclide ao="0.0013910784540858878" name="U234"/>
+    <nuclide ao="0.19951781403558216" name="U235"/>
+    <nuclide ao="0.799091107510332" name="U238"/>
+    <nuclide ao="1.99514" name="O16"/>
+    <nuclide ao="0.00076" name="O17"/>
+    <nuclide ao="0.0041" name="O18"/>
+  </material>
+  <material id="1" name="mClad" temperature="1000.0">
+    <density units="g/cm3" value="6.59"/>
+    <nuclide ao="0.25725" name="Zr90"/>
+    <nuclide ao="0.0561" name="Zr91"/>
+    <nuclide ao="0.08575" name="Zr92"/>
+    <nuclide ao="0.0869" name="Zr94"/>
+    <nuclide ao="0.014" name="Zr96"/>
+    <nuclide ao="0.49465" name="C12"/>
+    <nuclide ao="0.00535" name="C13"/>
+  </material>
+  <material id="2" name="mMod_graphite" temperature="1000.0">
+    <density units="g/cm3" value="1.82"/>
+    <nuclide ao="0.9893" name="C12"/>
+    <nuclide ao="0.0107" name="C13"/>
+    <sab name="c_Graphite"/>
+  </material>
+  <material id="3" name="mCool" temperature="1000.0">
+    <density units="g/cm3" value="3.342964522860016"/>
+    <nuclide ao="0.999999" name="He4"/>
+    <nuclide ao="1e-06" name="He3"/>
+  </material>
+</materials>

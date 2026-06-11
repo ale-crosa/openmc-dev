@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<settings>
+  <run_mode>eigenvalue</run_mode>
+  <particles>1000</particles>
+  <batches>150</batches>
+  <inactive>10</inactive>
+  <temperature_method>interpolation</temperature_method>
+  <volume_calc>
+    <domain_type>material</domain_type>
+    <domain_ids>3 1 0 2</domain_ids>
+    <samples>50000000</samples>
+    <lower_left>-16 -16 -100.05333333333334</lower_left>
+    <upper_right>16 16 100.05333333333334</upper_right>
+  </volume_calc>
+</settings>

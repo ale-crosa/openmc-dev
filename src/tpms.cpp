@@ -4,6 +4,14 @@
 
 #include "openmc/constants.h"
 
+#include <boost/math/tools/roots.hpp>    // it authomatically includes: using std::abs
+
+#include "openmc/bisect.h"
+#include "openmc/brent.h"
+
+//#include <cmath>
+//using std::abs;
+
 namespace openmc {
 
 // *****************************************************************************
@@ -27,7 +35,52 @@ TPMS::TPMS(double _x0, double _y0, double _z0, double _a, double _b, double _c,
   i = _i;
 }
 
-TPMS::rootFinding TPMS::root_in_interval(
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////// MODIFICATION - new root_in_interval without derivatives ///////////////////////////////////////////////////////////////
+TPMS::rootFinding TPMS::root_in_interval_subintervals(
+  double L0, double L1, Position r, Direction u)
+{
+  rootFinding solution;
+  solution.isRoot = false;          // Initialize to False in case nothing is found in the interval!!
+  solution.xa = L0;                 // Initialize solution xa
+  solution.xb = L1;                 // Initialize solution xb        
+  int n_subintervals = 2;                    // Divide your big interval in TOT subintervals
+  double tot_width = L1 - L0;                // = w0 when call this function in ray_tracing()
+  double dn = tot_width / n_subintervals;    // subintervals width = dn
+  double previous_n = L0;                          // Initialize left side of subinterval
+  double previous_f = this->fk(previous_n, r, u);  // Initialize function value of left side of subinterval
+
+  // Start for loop, it terminates when you find a root or, if it doesn't find any root, it terminates saying solution.isRoot=False
+  //NB: using "return soultion" to exit the function, I don't need to use "else if" or "else" between different IF controls
+  for (int n = 1; n <= n_subintervals; ++n) {
+    double current_n = L0 + n * dn;                 //Update right side of subinterval
+    double current_f = this->fk(current_n, r, u);   //Update function value of the right side of subinterval
+    if (current_f == 0.0) {                         //If the right extreme is already=0, save solution, exit!!
+      solution.isRoot = true;
+      solution.xa = current_n;
+      solution.xb = current_n;
+      return solution;
+    }
+    // If I find opposite sign in the subinterval I save this subinterval (so the extreme as solution)
+    // In this way I obtain the FIRST variation of sign of the function inside w0 (cause I go left to right)
+    if (std::signbit(previous_f) != std::signbit(current_f)) {
+      solution.isRoot = true;
+      solution.xa = previous_n;
+      solution.xb = current_n;
+      return solution;
+    }
+    previous_n = current_n;       // update left extreme n
+    previous_f = current_f;       // update left extreme f
+  }       // close for() loop 
+  return solution;     //If nothing was found ---> solution.isRoot=False
+}
+///////////////////////// END MODIFICATION  ///////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////// ORIGINAL root_in_interval() function (Ferney) ////////////////////////////////////////////////////////////////////////////
+TPMS::rootFinding TPMS::root_in_interval_derivatives(
   double L0, double L1, Position r, Direction u)
 {
   bool solFound = false;
@@ -67,7 +120,7 @@ TPMS::rootFinding TPMS::root_in_interval(
                                 // half to study root existance. (rare case)
         {
           TPMS::rootFinding firstInterval =
-            this->root_in_interval(L0, 0.5 * (L0 + L1), r, u);
+            this->root_in_interval_derivatives(L0, 0.5 * (L0 + L1), r, u);
           if (firstInterval.isRoot == true) {
             solFound = true;
             solution.isRoot = true;
@@ -76,7 +129,7 @@ TPMS::rootFinding TPMS::root_in_interval(
             solution.status = firstInterval.status;
           } else {
             solFound = true;
-            solution = this->root_in_interval(0.5 * (L0 + L1), L1, r, u);
+            solution = this->root_in_interval_derivatives(0.5 * (L0 + L1), L1, r, u);
           }
         } else if (std::signbit(fppa) !=
                    std::signbit(fa)) // If no inflexion change and the sign of
@@ -121,38 +174,125 @@ TPMS::rootFinding TPMS::root_in_interval(
   }
   return solution;
 }
+////////////////////////// END ORIGINAL ////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////// ray_tracing() function with different algorithms for root finding ///////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 double TPMS::ray_tracing(Position r, Direction u, double max_range)
 {
+  // Read solver choice of algorithm and bracketing method
+  static const char* env_solver  = std::getenv("TPMS_SOLVER");
+  static const char* env_bracket = std::getenv("TPMS_BRACKET");
+  static const std::string solver  = (env_solver  != nullptr) ? env_solver  : "toms748";
+  static const std::string bracket = (env_bracket != nullptr) ? env_bracket : "derivatives";
+  // default = toms748 if environment variable is not set
+  // default = derivatives method if environment variable is not set
+
   std::uintmax_t max_iter = 1000000;
   const double w0 = this->sampling_frequency(u);
-  double L0 = 1.e-7; // A tolerance is set to discard eventual zero solutions
+  double L0 = 1.e-7;
   double L1 = L0 + w0;
-  double root;
-  bool rootFound = false;
-  while (L0 < max_range && rootFound == false) {
-    TPMS::rootFinding solution = this->root_in_interval(L0, L1, r, u);
-    if (solution.isRoot) {
-      // std::pair<double, double> sol =
-      // boost::math::tools::bisect([this,r,u](double k){return this->fk(k, r,
-      // u);}, solution.xa, solution.xb, [](double l, double r){return std::abs(l-r)
-      // < 1e-8;});
-      std::pair<double, double> sol =
-        bisect([this, r, u](double k) { return this->fk(k, r, u); },
-          solution.xa, solution.xb,
-          [](double l, double r) { return std::abs(l - r) < 1e-8; }, max_iter);
-      root = sol.second;
-      rootFound = true;
+
+  while (L0 < max_range) {
+
+    if (L1 > max_range)    // check to be inside the TPMS area
+      L1 = max_range;
+
+    // Select which root_in_interval() function to use ---> derivatives or subinterval method
+    TPMS::rootFinding solution;
+    if (bracket == "derivatives") {  // Original Ferney
+      solution = this->root_in_interval_derivatives(L0, L1, r, u);
+    } else if (bracket == "subintervals") {  // New code
+      solution = this->root_in_interval_subintervals(L0, L1, r, u);
     } else {
-      L0 += w0;
-      L1 += w0;
+      fatal_error("TPMS_BRACKET unknown value: '" + bracket +
+                  "'. Valid options: original, simple.");
     }
+
+    if (solution.isRoot) {
+      if (solution.xa == solution.xb)    // If the bracket already coincides with the root
+        return solution.xa;
+
+      double root;
+
+      if (solver == "toms748") {
+        ///////////////////////////////////////////////// TOMS 748 ////////////////////////////////////////////////////////////////////
+        std::pair<double, double> sol =
+          boost::math::tools::toms748_solve([this, r, u](double k) { return this->fk(k, r, u); },
+            solution.xa, solution.xb,
+            [](double l, double r) { return std::abs(l - r) < 1.e-8; }, max_iter);
+        root = sol.second;
+
+      } else if (solver == "bisection") {
+        //////////////////////////////////////////////// BISECTION /////////////////////////////////////////////////////////////////
+        std::pair<double, double> sol = bisect([this, r, u](double k) { return this->fk(k, r, u); },
+            solution.xa, solution.xb,
+            [](double l, double r) { return std::abs(l - r) < 1.e-8; }, max_iter);
+        root = sol.second;
+
+      } else if (solver == "brent") {
+        /////////////////////////////////////////////////// BRENT ////////////////////////////////////////////////////////////////
+        std::pair<double, double> sol = brent([this, r, u](double k) { return this->fk(k, r, u); },
+            solution.xa, solution.xb,
+            [](double l, double r) { return std::abs(l - r) < 1.e-8; }, max_iter);
+        root = sol.second;
+
+      } else if (solver == "newton") {
+        ///////////////////////////////////////// NEWTON-RAPHSON (with bisection fallback) ////////////////////////////////////////
+        double xa   = solution.xa;
+        double xb   = solution.xb;
+        double fa   = this->fk(xa, r, u);
+        double xroot = 0.5 * (xa + xb);
+
+        for (int iter = 0; iter < 1000; ++iter) {
+          double f  = this->fk(xroot, r, u);
+          double fp = this->fpk(xroot, r, u);
+
+          // Update bracket [xa,xb] with the new solution x_n+1 found
+          if (std::signbit(f) == std::signbit(fa)) {
+              xa = xroot;   // root is not towards xa → move xa
+          } else {
+              xb = xroot;   // root is not towards xb → move xb
+          }
+
+          // Calcolate newton f/f'
+          double step = f / fp;
+          double next = xroot - step;
+
+          // If newton gives a solution inside the bracket, use it!!
+          // Otherwise --> use bisection
+          if (next > xa && next < xb) {     // use Newton
+              xroot = next;
+          } else {
+              xroot = 0.5 * (xa + xb);       // if the new solution ends up out of the brackets --> bisection 
+          }
+
+          // Convergence criteria to select the final rooot
+          if (std::abs(xb - xa) < 1.e-8) {
+              break;
+          }
+        }
+        root = xroot;
+
+      } 
+      else {
+        //////////////////////////////////////// If NO valid label in input //////////////////////////////////////////////////////////
+        fatal_error("TPMS_SOLVER environment variable has unknown value: '" +
+                    solver + "'. Valid options: toms748, bisection, brent, newton.");
+      }
+
+      return root;
+    }
+    // move on along the ray direction scanning new interval
+    L0 += w0;
+    L1 += w0;
   }
-  if (L0 >= max_range) {
-    root = INFTY;
-  }
-  return root;
+  return INFTY;
 }
+//////////////////////////////// END ray_tracing() ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 // *****************************************************************************
 // *   TPMS CLASSIC DEFINITION WITH CONSTANT PITCH AND ISOVALUE

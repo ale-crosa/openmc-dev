@@ -28,6 +28,7 @@
 #define OPENMC_BISECT_H
 
 #include <iostream>
+#include <cmath>
 
 template<class F, class Tol>
 std::pair<double, double> bisect(
