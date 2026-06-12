@@ -81,6 +81,12 @@ There is a conflict between your conda env shared libraries and shared libraries
 cmake .. -DCMAKE_PREFIX_PATH=/opt/anaconda3/envs/openmc-TPMS/ -DOPENMC_USE_MPI=ON -DCMAKE_FIND_USE_CMAKE_SYSTEM_PATH=FALSE -DCMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH=FALSE 
 ```
 
+## Root search algorithm selection
+The method used to search the roots of the distance equation can be directly selected in the Python script using an environment variable working as key of a dictionary.
+The environment variable **TPMS_BRACKET** takes, as value:
+- "derivatives" to use the original root_in_interval() function, which performs checks on the function derivatives to decide whether or not an interval contains a root.
+- "subintervals" to use a simplified root_in_interval() function, which split each sampled interval in two and performs checks on functions sign changes to decide whether or not an interval contains a root.
+
 # OpenMC Monte Carlo Particle Transport Code
 
 [![License](https://img.shields.io/badge/license-MIT-green)](https://docs.openmc.org/en/latest/license.html)
