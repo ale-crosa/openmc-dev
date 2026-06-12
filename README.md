@@ -82,11 +82,16 @@ cmake .. -DCMAKE_PREFIX_PATH=/opt/anaconda3/envs/openmc-TPMS/ -DOPENMC_USE_MPI=O
 ```
 
 ## Root search algorithm selection
-The method used to search the roots of the distance equation can be directly selected in the Python script using an environment variable working as key of a dictionary.
+The method used to search the roots of the distance equation can be directly selected in the Python script using two environment variables working as keys of a dictionary. \
 The environment variable **TPMS_BRACKET** takes, as value:
-- "derivatives" to use the original root_in_interval() function, which performs checks on the function derivatives to decide whether or not an interval contains a root.
-- "subintervals" to use a simplified root_in_interval() function, which split each sampled interval in two and performs checks on functions sign changes to decide whether or not an interval contains a root.
-
+- **"derivatives"** to use the original root_in_interval() function, which performs checks on sign changes of function derivatives to decide whether or not an interval contains a root.
+- **"subintervals"** to use a simplified root_in_interval() function, which split each sampled interval in two and performs checks on functions sign changes to decide whether or not an interval contains a root.
+The environment variable **TPMS_SOLVER** takes, instead, one of the following algorithms used to look for the exact position of the root inside the interval previously selected with the root_in_interval() function:
+- **"brent"** to use the Brent algorithm.
+- **"toms748"** to use the Toms-748 algorithm (similar to Brent, but uses also the cubic inverse interpolation).
+- **"newton"** to use the Newton-Rapson algorithm implemented with a fallback to bisection algorithm in case the solution falls outside the bracketed interval.
+- **"bisection"** to use bisection method.
+ 
 # OpenMC Monte Carlo Particle Transport Code
 
 [![License](https://img.shields.io/badge/license-MIT-green)](https://docs.openmc.org/en/latest/license.html)
