@@ -82,11 +82,11 @@ cmake .. -DCMAKE_PREFIX_PATH=/opt/anaconda3/envs/openmc-TPMS/ -DOPENMC_USE_MPI=O
 ```
 
 ## Root search algorithm selection
-The method used to search the roots of the distance equation can be directly selected in the Python script using two environment variables working as keys of a dictionary. \\
+The method used to search the roots of the distance equation can be directly selected in the Python script using two environment variables working as keys of a dictionary. \
 
 The environment variable **TPMS_BRACKET** takes, as value:
 - **"derivatives"** to use the original root_in_interval() function, which performs checks on sign changes of function derivatives to decide whether or not an interval contains a root.
-- **"subintervals"** to use a simplified root_in_interval() function, which split each sampled interval in two and performs checks on functions sign changes to decide whether or not an interval contains a root. \\
+- **"subintervals"** to use a simplified root_in_interval() function, which split each sampled interval in two and performs checks on functions sign changes to decide whether or not an interval contains a root. \
 
 The environment variable **TPMS_SOLVER** takes, instead, one of the following algorithms used to look for the exact position of the root inside the interval previously selected with the root_in_interval() function:
 - **"brent"** to use the Brent algorithm.
