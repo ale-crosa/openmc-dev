@@ -86,9 +86,9 @@ The method used to search the roots of the distance equation can be directly sel
 
 The environment variable **TPMS_BRACKET** takes, as value:
 - **"derivatives"** to use the original root_in_interval() function, which performs checks on sign changes of function derivatives to decide whether or not an interval contains a root.
-- **"subintervals"** to use a simplified root_in_interval() function, which split each sampled interval in two and performs checks on functions sign changes to decide whether or not an interval contains a root. 
+- **"subintervals"** to use a simplified *root_in_interval()* function, which split each sampled interval in two and performs checks on functions sign changes to decide whether or not an interval contains a root. 
 
-The environment variable **TPMS_SOLVER** takes, instead, one of the following algorithms used to look for the exact position of the root inside the interval previously selected with the root_in_interval() function:
+The environment variable **TPMS_SOLVER** takes, instead, one of the following algorithms used to look for the exact position of the root inside the interval previously selected with the *root_in_interval()* function:
 - **"brent"** to use the Brent algorithm.
 - **"toms748"** to use the Toms-748 algorithm (similar to Brent, but uses also the cubic inverse interpolation).
 - **"newton"** to use the Newton-Rapson algorithm implemented with a fallback to bisection algorithm in case the solution falls outside the bracketed interval.
