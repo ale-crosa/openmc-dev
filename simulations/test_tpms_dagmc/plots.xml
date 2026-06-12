@@ -3,9 +3,6 @@
   <plot basis="xy" color_by="material" id="1" type="slice">
     <pixels>300 300</pixels>
     <origin>0 0 0</origin>
-    <width>1 1</width>
-    <color id="0" rgb="255 0 0"/>
-    <color id="1" rgb="128 128 128"/>
-    <color id="2" rgb="0 0 255"/>
+    <width>10.0 10.0</width>
   </plot>
 </plots>

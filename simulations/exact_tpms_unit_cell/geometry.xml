@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<geometry>
+  <cell id="0" material="0" name="cFuel" region="1 -2 3 -4 5 -6 10 -11" universe="0"/>
+  <cell id="1" material="1" name="cClad" region="1 -2 3 -4 5 -6 8 -9" universe="0"/>
+  <cell id="2" material="1" name="cClad" region="1 -2 3 -4 5 -6 12 -13" universe="0"/>
+  <cell id="3" material="void" name="cGap" region="1 -2 3 -4 5 -6 9 -10" universe="0"/>
+  <cell id="4" material="void" name="cGap" region="1 -2 3 -4 5 -6 11 -12" universe="0"/>
+  <cell id="5" material="2" name="cCool" region="1 -2 3 -4 5 -6 (-8 | 13)" universe="0"/>
+  <cell fill="0" id="6" name="root" region="1 -2 3 -4 5 -6" universe="1"/>
+  <surface boundary="periodic" coeffs="-5.0" id="1" periodic_surface_id="2" type="x-plane"/>
+  <surface boundary="periodic" coeffs="5.0" id="2" periodic_surface_id="1" type="x-plane"/>
+  <surface boundary="periodic" coeffs="-5.0" id="3" periodic_surface_id="4" type="y-plane"/>
+  <surface boundary="periodic" coeffs="5.0" id="4" periodic_surface_id="3" type="y-plane"/>
+  <surface boundary="periodic" coeffs="-5.0" id="5" periodic_surface_id="6" type="z-plane"/>
+  <surface boundary="periodic" coeffs="5.0" id="6" periodic_surface_id="5" type="z-plane"/>
+  <surface coeffs="-0.4725258104713921 10 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0" id="8" surface_type="Gyroid" type="tpms"/>
+  <surface coeffs="-0.3243702925178982 10 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0" id="9" surface_type="Gyroid" type="tpms"/>
+  <surface coeffs="-0.29979207665128116 10 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0" id="10" surface_type="Gyroid" type="tpms"/>
+  <surface coeffs="0.29979207665128116 10 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0" id="11" surface_type="Gyroid" type="tpms"/>
+  <surface coeffs="0.3243702925178982 10 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0" id="12" surface_type="Gyroid" type="tpms"/>
+  <surface coeffs="0.4725258104713921 10 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0 0.0 0.0 0.0 1.0" id="13" surface_type="Gyroid" type="tpms"/>
+</geometry>

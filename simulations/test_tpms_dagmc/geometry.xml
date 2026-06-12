@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<geometry>
+  <cell fill="1" id="1" name="root_cell" region="1 -2 3 -4 5 -6" universe="2"/>
+  <dagmc_universe auto_geom_ids="true" filename="/home/alessio_crosa/openmc_simulations/test_tpms_dagmc/dagmc.h5m" id="1"/>
+  <surface boundary="periodic" coeffs="-5.0" id="1" periodic_surface_id="2" type="x-plane"/>
+  <surface boundary="periodic" coeffs="5.0" id="2" periodic_surface_id="1" type="x-plane"/>
+  <surface boundary="periodic" coeffs="-5.0" id="3" periodic_surface_id="4" type="y-plane"/>
+  <surface boundary="periodic" coeffs="5.0" id="4" periodic_surface_id="3" type="y-plane"/>
+  <surface boundary="periodic" coeffs="-5.0" id="5" periodic_surface_id="6" type="z-plane"/>
+  <surface boundary="periodic" coeffs="5.0" id="6" periodic_surface_id="5" type="z-plane"/>
+</geometry>
