@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <settings>
   <run_mode>eigenvalue</run_mode>
-  <particles>200000</particles>
+  <particles>30000</particles>
   <batches>200</batches>
-  <inactive>20</inactive>
+  <inactive>15</inactive>
   <volume_calc>
     <domain_type>material</domain_type>
     <domain_ids>2 1 0</domain_ids>
     <samples>100000000</samples>
-    <lower_left>-8.0 -8.0 -8.0</lower_left>
-    <upper_right>8.0 8.0 8.0</upper_right>
+    <lower_left>-0.5 -0.5 -0.5</lower_left>
+    <upper_right>0.5 0.5 0.5</upper_right>
   </volume_calc>
 </settings>

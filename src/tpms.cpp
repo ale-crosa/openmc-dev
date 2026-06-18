@@ -38,13 +38,13 @@ TPMS::TPMS(double _x0, double _y0, double _z0, double _a, double _b, double _c,
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////// MODIFICATION - new root_in_interval without derivatives ///////////////////////////////////////////////////////////////
 TPMS::rootFinding TPMS::root_in_interval_subintervals(
-  double L0, double L1, Position r, Direction u)
+  double L0, double L1, Position r, Direction u, int n_subintervals)
 {
   rootFinding solution;
   solution.isRoot = false;          // Initialize to False in case nothing is found in the interval!!
   solution.xa = L0;                 // Initialize solution xa
   solution.xb = L1;                 // Initialize solution xb        
-  int n_subintervals = 2;                    // Divide your big interval in TOT subintervals
+  //int n_subintervals = 2;                    // Divide your big interval in TOT subintervals
   double tot_width = L1 - L0;                // = w0 when call this function in ray_tracing()
   double dn = tot_width / n_subintervals;    // subintervals width = dn
   double previous_n = L0;                          // Initialize left side of subinterval
@@ -184,11 +184,13 @@ double TPMS::ray_tracing(Position r, Direction u, double max_range)
   // Read solver choice of algorithm and bracketing method
   static const char* env_solver  = std::getenv("TPMS_SOLVER");
   static const char* env_bracket = std::getenv("TPMS_BRACKET");
+  static const char* env_n_subint    = std::getenv("TPMS_N_SUBINTERVALS");
   static const std::string solver  = (env_solver  != nullptr) ? env_solver  : "toms748";
   static const std::string bracket = (env_bracket != nullptr) ? env_bracket : "derivatives";
+  static const int n_subintervals  = (env_n_subint != nullptr) ? std::stoi(env_n_subint) : 2;
   // default = toms748 if environment variable is not set
   // default = derivatives method if environment variable is not set
-
+  // default = 2 subintervals if environment variable is not set
   std::uintmax_t max_iter = 1000000;
   const double w0 = this->sampling_frequency(u);
   double L0 = 1.e-7;
@@ -201,13 +203,13 @@ double TPMS::ray_tracing(Position r, Direction u, double max_range)
 
     // Select which root_in_interval() function to use ---> derivatives or subinterval method
     TPMS::rootFinding solution;
-    if (bracket == "derivatives") {  // Original Ferney
+    if (bracket == "derivatives") {          // Original Ferney
       solution = this->root_in_interval_derivatives(L0, L1, r, u);
     } else if (bracket == "subintervals") {  // New code
-      solution = this->root_in_interval_subintervals(L0, L1, r, u);
+      solution = this->root_in_interval_subintervals(L0, L1, r, u, n_subintervals);
     } else {
       fatal_error("TPMS_BRACKET unknown value: '" + bracket +
-                  "'. Valid options: original, simple.");
+                  "'. Valid options: derivatives, subitervals.");
     }
 
     if (solution.isRoot) {
